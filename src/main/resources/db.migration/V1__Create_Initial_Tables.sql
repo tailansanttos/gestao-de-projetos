@@ -26,7 +26,7 @@ CREATE TABLE projects(
     CONSTRAINT  fk_project_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE  CASCADE
 );
 
-CREATE TABLE project_member(
+CREATE TABLE project_members(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     role project_role NOT NULL,
     user_id UUID NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE project_member(
     CONSTRAINT uq_member UNIQUE (user_id, project_id)
 );
 
-CREATE TABLE task (
+CREATE TABLE tasks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(150) NOT NULL,
     description TEXT,
