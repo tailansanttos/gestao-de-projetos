@@ -117,6 +117,9 @@ public class Project {
     //Metodos do agregado
 
     public void addMember(User user, ProjectRole role) {
+        if (role == ProjectRole.OWNER){
+            throw new IllegalArgumentException("Não é permitido criar um Projeto com owner.");
+        }
 
         if (members.stream().anyMatch(member -> member.getUser().getId().equals(user.getId()))){
             throw new IllegalArgumentException("Usuário já é membro do projeto.");

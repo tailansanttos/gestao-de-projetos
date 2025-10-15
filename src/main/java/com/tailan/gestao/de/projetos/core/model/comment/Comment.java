@@ -1,5 +1,7 @@
 package com.tailan.gestao.de.projetos.core.model.comment;
 
+import com.tailan.gestao.de.projetos.core.model.project.Project;
+import com.tailan.gestao.de.projetos.core.model.projectMember.ProjectMember;
 import com.tailan.gestao.de.projetos.core.model.task.Task;
 import com.tailan.gestao.de.projetos.core.model.user.User;
 import jakarta.persistence.*;
@@ -39,13 +41,29 @@ public class Comment {
 
     }
 
-    public Comment(String text, Task task, User author, OffsetDateTime createdAt) {
+    public Comment(String text, Task task, User author) {
         this.id = UUID.randomUUID();
         this.text = text;
         this.task = task;
         this.author = author;
-        this.createdAt = createdAt;
     }
+
+    public void edit(String newText){
+        if (newText == null) return;
+        this.text = newText;
+        this.updatedAt = OffsetDateTime.now();
+    }
+
+    public boolean canEdit(User user){
+        return this.author.equals(user);
+    }
+
+    public boolean canDelete(User user){
+        return this.author.equals(user);
+    }
+
+
+
     public UUID getId() {
         return id;
     }

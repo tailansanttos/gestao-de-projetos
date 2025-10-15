@@ -78,6 +78,47 @@ public class Task {
         this.status = TaskStatus.TODO;
     }
 
+    public void assignTo(User user){
+        boolean isMember = project.getMembers().stream()
+                .anyMatch(member -> member.getId().equals(user.getId()));
+        if (!isMember){
+            throw new IllegalArgumentException("Usuário não é membro do projeto.");
+        }
+
+        this.assignee = user;
+    }
+
+    public boolean markDone(){
+        if (this.status == TaskStatus.DONE) return false;
+
+        this.status = TaskStatus.DONE;
+        this.updatedAt = OffsetDateTime.now();
+        return true;
+    }
+
+    public boolean markTodo(){
+        if (this.status == TaskStatus.DONE) return false;
+
+        this.status = TaskStatus.TODO;
+        this.updatedAt = OffsetDateTime.now();
+        return true;
+    }
+
+
+    public void updateDetails(String title, String description, TaskPriority priority, LocalDate dueDate) {
+        if (title == null || description == null || priority == null || dueDate == null) {
+            throw new IllegalArgumentException("Todos os campos devem ser preenchidos.");
+        }
+        if (dueDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("O dia de validade da task não pode ser no tempo atrás.");
+        }
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+        this.dueDate = dueDate;
+    }
+
+
     public UUID getId() {
         return id;
     }

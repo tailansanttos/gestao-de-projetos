@@ -1,7 +1,9 @@
 package com.tailan.gestao.de.projetos.core.model.projectMember;
 
 import com.tailan.gestao.de.projetos.core.enums.ProjectRole;
+import com.tailan.gestao.de.projetos.core.model.comment.Comment;
 import com.tailan.gestao.de.projetos.core.model.project.Project;
+import com.tailan.gestao.de.projetos.core.model.task.Task;
 import com.tailan.gestao.de.projetos.core.model.user.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -42,15 +44,25 @@ public class ProjectMember {
     }
 
     public ProjectMember(ProjectRole projectRole, User user, Project project) {
-        if (projectRole == ProjectRole.OWNER){
-            throw new IllegalArgumentException("Não é permitido criar um Projeto com owner.");
-        }
+
         if (user == null || project == null || projectRole == null){
             throw new IllegalArgumentException("Campos user, project e role são obrigatorios");
         }
         this.projectRole = projectRole;
         this.user = user;
         this.project = project;
+    }
+
+    public void assignRole(ProjectRole projectRole){
+        this.projectRole = projectRole;
+    }
+
+    public boolean canEditTask(Task task){
+        return projectRole != ProjectRole.VIEWER;
+    }
+
+    public boolean canDeleteComment(Comment comment){
+        return projectRole != ProjectRole.VIEWER && projectRole != ProjectRole.MEMBER;
     }
 
     public UUID getId() {
