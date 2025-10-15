@@ -3,6 +3,7 @@ package com.tailan.gestao.de.projetos.application.service.project.impl;
 import com.tailan.gestao.de.projetos.application.dto.project.*;
 import com.tailan.gestao.de.projetos.application.mapper.ProjectMapper;
 import com.tailan.gestao.de.projetos.application.service.project.ProjectService;
+import com.tailan.gestao.de.projetos.application.service.user.UserService;
 import com.tailan.gestao.de.projetos.core.model.project.Project;
 import com.tailan.gestao.de.projetos.core.model.projectMember.ProjectMember;
 import com.tailan.gestao.de.projetos.core.model.user.User;
@@ -18,14 +19,15 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ProjectMapper projectMapper;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, UserRepository userRepository, ProjectMapper projectMapper) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, UserService userService, ProjectMapper projectMapper) {
         this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.projectMapper = projectMapper;
     }
+
 
     @Override
     public ProjectResponseDTO createProject(CreateProjectDTO createProjectRequest) {
@@ -40,13 +42,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void addMemberToProject(AddMemberDTO addMemberRequest) {
         // Verificar se quem está tentando adicionar membro é o DONO OU ADMIN PELA ROLE
-        Optional<User> userOpt = userRepository.findById(addMemberRequest.userId());
-        if (userOpt.isEmpty()){
-            throw new IllegalArgumentException("Usuário não encontrado");
-        }
-        Project project = getProject(addMemberRequest.projectId());
+        User user = userService.getUserById(addMemberRequest.userId());
 
-        User user = userOpt.get();
+        Project project = getProject(addMemberRequest.projectId());
 
         project.addMember(user, addMemberRequest.role());
         projectRepository.save(project);
@@ -77,10 +75,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectResponseDTO> getProjectsByOwner(UUID owner) {
-        Optional<User> OptionalUser = userRepository.findById(owner);
-        if (OptionalUser.isEmpty()){
-            throw new IllegalArgumentException("Usuário não existe.");
-        }
+        User user = userService.getUserById(owner);
 
         List<Project> listProjectsByUser = projectRepository.findAllByOwnerId(owner);
         return listProjectsByUser.stream().map(projectMapper::toResponse).collect(Collectors.toList());
