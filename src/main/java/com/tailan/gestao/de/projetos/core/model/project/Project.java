@@ -41,8 +41,9 @@ public class Project {
 
     }
 
-    public Project(String name, LocalDate startDate, UUID ownerId) {
-        setName(name);
+    public Project(String name, String description, LocalDate startDate, UUID ownerId) {
+        this.name = name;
+        this.description = description;
         this.startDate = startDate;
         this.ownerId = ownerId;
     }
