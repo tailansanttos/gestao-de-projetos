@@ -54,6 +54,7 @@ public class User {
         this.email = email;
         this.passwordHash = passwordHash;
         this.roles.add(Role.USER);
+        this.createdAt = OffsetDateTime.now();
     }
 
 
