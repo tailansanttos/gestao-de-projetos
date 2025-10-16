@@ -20,14 +20,13 @@ public class JWTService {
     public String generateToken(User user){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
+            return JWT.create()
                     .withSubject(user.getEmail())
                     .withIssuedAt(creationDate())
                     .withExpiresAt(generateExpiration())
                     .withIssuer(issuer)
                     .withClaim("email", user.getEmail())
                     .sign(algorithm);
-            return token;
         }catch (JWTCreationException e){
             throw new JWTCreationException("Erro ao gerar token.", e);
         }
@@ -62,7 +61,7 @@ public class JWTService {
     private Instant creationDate(){
         return Instant.now();
     }
-    private Instant generateExpiration(){
+    public Instant generateExpiration(){
         return Instant.now().plusSeconds(3600);
     }
 }

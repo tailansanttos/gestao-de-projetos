@@ -13,25 +13,24 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.naming.AuthenticationException;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
 public class AuthServiceImpl implements AuthService {
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JWTService   jwtService;
 
-    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JWTService jwtService) {
+    public AuthServiceImpl(UserService userService, AuthenticationManager authenticationManager, JWTService jwtService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
     }
+
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO){
@@ -43,7 +42,8 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userService.getUserByEmail(loginRequestDTO.email());
         String token = jwtService.generateToken(user);
-        return new LoginResponseDTO(token, LocalDateTime.now(), user.getId());
+
+        return new LoginResponseDTO(token, user.getEmail());
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.tailan.gestao.de.projetos.application.dto.auth.RegisterRequestDTO;
 import javax.naming.AuthenticationException;
 
 public interface AuthService {
-    LoginResponseDTO login(LoginRequestDTO loginRequestDTO) throws AuthenticationException;
+    LoginResponseDTO login(LoginRequestDTO loginRequestDTO);
     void register(RegisterRequestDTO registerRequestDTO);
     LoginResponseDTO refreshToken(LoginRequestDTO loginRequestDTO);
 }

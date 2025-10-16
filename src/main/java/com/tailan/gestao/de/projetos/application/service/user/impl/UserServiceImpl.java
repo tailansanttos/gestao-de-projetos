@@ -32,9 +32,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO createUser(CreateUserDTO dto) {
-        User user = getUserByEmail(dto.email());
+        Optional<User> optionalUser = userRepository.findByEmail(dto.email());
+        if (optionalUser.isPresent()) {
+            throw new IllegalArgumentException("Usuário com este email já cadastrado. Tente novamente com outro email");
+        }
 
-        user = userMapper.toEntity(dto);
+        User user = userMapper.toEntity(dto);
+
         String passwordHash = passwordEncoder.encode(dto.password());
         user.setPasswordHash(passwordHash);
         User savedUser = userRepository.save(user);
