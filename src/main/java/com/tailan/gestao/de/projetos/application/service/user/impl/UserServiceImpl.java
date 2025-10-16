@@ -32,13 +32,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO createUser(CreateUserDTO dto) {
-        Optional<User> existingUser = userRepository.findByEmail(dto.email());
-        if (existingUser.isPresent()) {
-            throw new IllegalArgumentException("Usuário com esse email já cadastrado. Tente com outro email.");
-        }
+        User user = getUserByEmail(dto.email());
 
-        User user = userMapper.toEntity(dto);
-        user.setPasswordHash(passwordEncoder.encode(dto.password()));
+        user = userMapper.toEntity(dto);
+        String passwordHash = passwordEncoder.encode(dto.password());
+        user.setPasswordHash(passwordHash);
         User savedUser = userRepository.save(user);
         return userMapper.toResponse(savedUser);
     }
@@ -94,5 +92,10 @@ public class UserServiceImpl implements UserService {
     public List<UserResponseDTO> listAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(userMapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
     }
 }
