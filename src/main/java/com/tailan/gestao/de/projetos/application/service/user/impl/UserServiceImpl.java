@@ -1,9 +1,6 @@
 package com.tailan.gestao.de.projetos.application.service.user.impl;
 
-import com.tailan.gestao.de.projetos.application.dto.user.CreateUserDTO;
-import com.tailan.gestao.de.projetos.application.dto.user.UpdatePasswordDTO;
-import com.tailan.gestao.de.projetos.application.dto.user.UpdateUserDTO;
-import com.tailan.gestao.de.projetos.application.dto.user.UserResponseDTO;
+import com.tailan.gestao.de.projetos.application.dto.user.*;
 import com.tailan.gestao.de.projetos.application.mapper.UserMapper;
 import com.tailan.gestao.de.projetos.application.service.user.UserService;
 import com.tailan.gestao.de.projetos.core.model.user.User;
@@ -94,5 +91,22 @@ public class UserServiceImpl implements UserService {
     public List<UserResponseDTO> listAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(userMapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public LoginResponseDTO login(LoginUserDTO dto) {
+        User user = getByEmail(dto.email());
+        String senhaLoginHash = passwordEncoder.encode(dto.password());
+        if (!user.getPasswordHash().equals(senhaLoginHash)) {
+            throw new IllegalArgumentException("Senha atual incorreta.");
+        }
+
+        return new LoginResponseDTO("token");
+    }
+
+
+    private User getByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() ->
+                new IllegalArgumentException("Usuário não encontrado."));
     }
 }

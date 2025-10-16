@@ -1,9 +1,6 @@
 package com.tailan.gestao.de.projetos.application.service.user;
 
-import com.tailan.gestao.de.projetos.application.dto.user.CreateUserDTO;
-import com.tailan.gestao.de.projetos.application.dto.user.UpdatePasswordDTO;
-import com.tailan.gestao.de.projetos.application.dto.user.UpdateUserDTO;
-import com.tailan.gestao.de.projetos.application.dto.user.UserResponseDTO;
+import com.tailan.gestao.de.projetos.application.dto.user.*;
 import com.tailan.gestao.de.projetos.core.model.user.User;
 
 import java.util.List;
@@ -16,4 +13,6 @@ public interface UserService {
     void deleteUser(UUID userId);
     User getUserById(UUID userId);
     List<UserResponseDTO> listAllUsers();
+
+    LoginResponseDTO login(LoginUserDTO dto);
 }
