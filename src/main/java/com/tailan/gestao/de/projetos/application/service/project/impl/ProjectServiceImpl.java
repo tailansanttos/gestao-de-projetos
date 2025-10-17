@@ -77,6 +77,7 @@ public class ProjectServiceImpl implements ProjectService {
         // Verificar se quem está tentando adicionar membro é o DONO OU ADMIN PELA ROLE
 
         boolean allowedToAddMember = enableUpdateOrAddOrRemoveMemberToProject(user, project);
+        if (!allowedToAddMember) throw new IllegalArgumentException("Somente admin ou o dono pode adicionar membro ao projeto");
 
         User userAddToMember = userService.getUserById(addMemberRequest.userId());
 

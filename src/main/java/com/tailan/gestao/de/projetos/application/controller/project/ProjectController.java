@@ -49,19 +49,19 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{ownerId}/project")
+    @GetMapping("/{ownerId}/owner")
     public ResponseEntity<List<ProjectResponseDTO>> getProjectsByOwner(@PathVariable UUID ownerId) {
         List<ProjectResponseDTO> projectResponseDTOS = projectService.getProjectsByOwner(ownerId);
         return new ResponseEntity<>(projectResponseDTOS, HttpStatus.OK);
     }
 
-    @GetMapping("/{projectId}/projectMembert")
+    @GetMapping("/{projectId}/projectMembers")
     public ResponseEntity<List<ProjectMemberDTO>> getProjectMembersByProject(@PathVariable UUID projectId) {
         List<ProjectMemberDTO> list = projectService.getProjectMembers(projectId);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("/{projectId}/get/{projectMemberId}")
+    @GetMapping("/{projectId}/get/{userId}")
     public ResponseEntity<ProjectMemberDTO> getProjectMember(@PathVariable UUID projectId, @PathVariable UUID projectMemberId) {
         ProjectMemberDTO projectMemberDTO = projectService.getProjectMember(projectId, projectMemberId);
         return new ResponseEntity<>(projectMemberDTO, HttpStatus.OK);
