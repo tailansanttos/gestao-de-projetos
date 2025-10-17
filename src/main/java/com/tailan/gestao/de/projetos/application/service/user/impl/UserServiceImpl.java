@@ -95,4 +95,11 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
         return users.stream().map(userMapper::toResponse).collect(Collectors.toList());
     }
+
+    @Override
+    public User getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não existe"));
+        return user;
+    }
 }

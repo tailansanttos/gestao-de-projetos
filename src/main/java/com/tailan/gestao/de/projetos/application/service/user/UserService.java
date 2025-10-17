@@ -16,4 +16,6 @@ public interface UserService {
     void deleteUser(UUID userId);
     User getUserById(UUID userId);
     List<UserResponseDTO> listAllUsers();
+
+    User getUserByEmail(String email);
 }

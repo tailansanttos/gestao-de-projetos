@@ -6,14 +6,16 @@ import com.tailan.gestao.de.projetos.core.model.project.Project;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
+import java.util.UUID;
 
 @Component
 public class ProjectMapper {
-    public Project toEntity(CreateProjectDTO createProjectDTO){
-        return new Project(createProjectDTO.name(),
+    public Project toEntity(CreateProjectDTO createProjectDTO, UUID ownerId){
+        return new Project(
+                createProjectDTO.name(),
                 createProjectDTO.description(),
                 createProjectDTO.startDate(),
-                createProjectDTO.ownerId());
+                ownerId);
     }
 
     public ProjectResponseDTO toResponse(Project project){

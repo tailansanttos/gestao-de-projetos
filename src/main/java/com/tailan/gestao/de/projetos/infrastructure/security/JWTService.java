@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Service
 public class JWTService {
@@ -62,6 +64,5 @@ public class JWTService {
         return Instant.now();
     }
     public Instant generateExpiration(){
-        return Instant.now().plusSeconds(3600);
-    }
+        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));    }
 }
