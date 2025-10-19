@@ -2,21 +2,23 @@ package com.tailan.gestao.de.projetos.application.service.project.impl;
 
 import com.tailan.gestao.de.projetos.application.dto.member.ProjectMemberDTO;
 import com.tailan.gestao.de.projetos.application.dto.project.*;
+import com.tailan.gestao.de.projetos.application.dto.task.TaskResponseDTO;
 import com.tailan.gestao.de.projetos.application.mapper.ProjectMapper;
 import com.tailan.gestao.de.projetos.application.service.project.ProjectService;
+import com.tailan.gestao.de.projetos.application.service.task.TaskService;
 import com.tailan.gestao.de.projetos.application.service.user.UserService;
 import com.tailan.gestao.de.projetos.core.enums.ProjectRole;
 import com.tailan.gestao.de.projetos.core.model.project.Project;
 import com.tailan.gestao.de.projetos.core.model.projectMember.ProjectMember;
 import com.tailan.gestao.de.projetos.core.model.user.User;
 import com.tailan.gestao.de.projetos.core.repository.ProjectRepository;
-import com.tailan.gestao.de.projetos.core.repository.UserRepository;
 import com.tailan.gestao.de.projetos.infrastructure.security.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,18 +45,21 @@ public class ProjectServiceImpl implements ProjectService {
         return customUserDetails.getUser();
     }
 
-    private boolean isOwnerOrAdmin(User user, Project project) {
-        return user.getId().equals(project.getOwnerId()) || project.isAdmin(user.getId());
+    @Override
+    public boolean isOwnerOrAdmin(User user, Project project) {
+        return project.isAdmin(user.getId());
     }
 
-    public boolean enableUpdateOrAddOrRemoveMemberToProject(User user, Project project) {
-        return isOwnerOrAdmin(user, project);
-    }
 
-    private boolean isOwner(User user, Project project) {
+    @Override
+    public boolean isOwner(User user, Project project) {
         return user.getId().equals(project.getOwnerId());
     }
 
+    @Override
+    public boolean isProjectMember(User user, Project project) {
+        return project.isProjectMember(user.getId());
+    }
 
 
     @Override
@@ -65,7 +70,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project project = projectMapper.toEntity(createProjectRequest, user.getId());
         project.setEndDate(LocalDate.now().plusDays(50));
+        project.addMember(user, ProjectRole.OWNER);
         Project createdProject = projectRepository.save(project);
+
 
         return projectMapper.toResponse(createdProject);
     }
@@ -76,7 +83,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = getProject(addMemberRequest.projectId());
         // Verificar se quem está tentando adicionar membro é o DONO OU ADMIN PELA ROLE
 
-        boolean allowedToAddMember = enableUpdateOrAddOrRemoveMemberToProject(user, project);
+        boolean allowedToAddMember = isOwnerOrAdmin(user, project);
         if (!allowedToAddMember) throw new IllegalArgumentException("Somente admin ou o dono pode adicionar membro ao projeto");
 
         User userAddToMember = userService.getUserById(addMemberRequest.userId());
@@ -84,14 +91,12 @@ public class ProjectServiceImpl implements ProjectService {
         project.addMember(userAddToMember, addMemberRequest.role());
         projectRepository.save(project);
     }
-
-
     @Override
     public void removeMemberToProject(RemoveMemberDTO removeMemberRequest) {
         User user = getUserByAuthentication();
         Project project = getProject(removeMemberRequest.projectId());
 
-        boolean allowedToRemoveMember = enableUpdateOrAddOrRemoveMemberToProject(user, project);
+        boolean allowedToRemoveMember = isOwnerOrAdmin(user, project);
 
         // Verificar se quem está tentando remover membro é o DONO OU ADMIN PELA ROLE
 
@@ -104,7 +109,7 @@ public class ProjectServiceImpl implements ProjectService {
         User user = getUserByAuthentication();
         Project project = getProject(projectId);
 
-        boolean enableUpdateProject = enableUpdateOrAddOrRemoveMemberToProject(user, project);
+        boolean enableUpdateProject = isOwnerOrAdmin(user, project);
         if (!enableUpdateProject) throw new IllegalArgumentException("Você não pode atualizar detalhes do projeto.");
 
         project.updateDetails(updateRequest.name(), updateRequest.description(), updateRequest.endDate());
@@ -135,26 +140,40 @@ public class ProjectServiceImpl implements ProjectService {
         User user = getUserByAuthentication();
 
         Project project = getProject(projectId);
+
+        boolean isProjectMember = isProjectMember(user, project);
+        if (!isProjectMember) return new ArrayList<>();
         return project.getMembers().stream()
                  .map(this::toDto).toList();
+
 
     }
 
     @Override
     public ProjectMemberDTO getProjectMember(UUID projectId, UUID projectMemberId) {
+        User user = getUserByAuthentication();
 
         Project project = getProject(projectId);
+
+        boolean isProjectMember = isProjectMember(user, project);
+        if (!isProjectMember){
+            throw new IllegalArgumentException("Você não tem permissão para acessar quem está nesse projeto.");
+        }
+
         ProjectMember projectMember = project.getMember(projectMemberId);
         return toDto(projectMember);
     }
 
-    private Project getProject(UUID projectId) {
+    @Override
+    public Project getProject(UUID projectId) {
         Optional<Project> project = projectRepository.findById(projectId);
         if (project.isEmpty()){
             throw new IllegalArgumentException("Projeto ainda não criado");
         }
         return project.get();
     }
+
+
 
     public ProjectMemberDTO toDto(ProjectMember projectMember) {
         return new ProjectMemberDTO(projectMember.getId(), projectMember.getProjectRole(),

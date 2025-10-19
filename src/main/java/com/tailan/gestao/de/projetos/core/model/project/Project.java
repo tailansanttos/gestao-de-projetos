@@ -160,18 +160,47 @@ public class Project {
         return true;
     }
 
-    public ProjectMember getMember(UUID userId){
-        Optional<ProjectMember> memberOpt = members.stream()
-                .filter(member -> member.getUser().getId().equals(userId))
-                .findFirst();
+    public boolean isProjectMember(UUID userId){
+        ProjectMember member = getMemberToUser(userId);
+        if (member == null){
+            return false;
+        }
+        return true;
+    }
 
-        if (memberOpt.isEmpty()){
+    public ProjectMember getMember(UUID memberId) {
+        Optional<ProjectMember> optMember =
+                members.stream().filter(member ->
+                        member.getId().equals(memberId)).findFirst();
+        if (optMember.isEmpty()){
             throw new IllegalArgumentException("Usuário não faz parte do projeto.");
         }
-
-        ProjectMember member = memberOpt.get();
-        return member;
+        return optMember.get();
     }
+
+    public ProjectMember getMemberToUser(UUID userId){
+        Optional<ProjectMember> optMember =
+                getMembers().stream().filter(member ->
+                        member.getUser().getId().equals(userId)).findFirst();
+        if (optMember.isEmpty()){
+            throw new IllegalArgumentException("Usuário não faz parte do projeto.");
+        }
+        return optMember.get();
+    }
+
+//    public ProjectMember getMemberByUserId(UUID userId){
+//        Optional<ProjectMember> memberOpt = members.stream()
+//                .filter(member -> member.getUser().getId().equals(userId))
+//                .findFirst();
+//
+//        if (memberOpt.isEmpty()){
+//            throw new IllegalArgumentException("Usuário não faz parte do projeto.");
+//        }
+//
+//        ProjectMember member = memberOpt.get();
+//        return member;
+//    }
+
 
     public void addTask(Task task) {
         if (!tasks.contains(task)) {

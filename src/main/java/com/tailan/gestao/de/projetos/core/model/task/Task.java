@@ -75,12 +75,11 @@ public class Task {
         this.title = title;
         this.description = description;
         this.priority = priority;
-        this.status = TaskStatus.TODO;
     }
 
     public void assignTo(User user){
         boolean isMember = project.getMembers().stream()
-                .anyMatch(member -> member.getId().equals(user.getId()));
+                .anyMatch(member -> member.getUser().getId().equals(user.getId()));
         if (!isMember){
             throw new IllegalArgumentException("Usuário não é membro do projeto.");
         }

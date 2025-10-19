@@ -2,8 +2,9 @@ package com.tailan.gestao.de.projetos.application.controller.project;
 
 import com.tailan.gestao.de.projetos.application.dto.member.ProjectMemberDTO;
 import com.tailan.gestao.de.projetos.application.dto.project.*;
+import com.tailan.gestao.de.projetos.application.dto.task.TaskResponseDTO;
 import com.tailan.gestao.de.projetos.application.service.project.ProjectService;
-import jakarta.persistence.GeneratedValue;
+import com.tailan.gestao.de.projetos.application.service.task.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,11 @@ import java.util.UUID;
 @RequestMapping("/project")
 public class ProjectController {
     private final ProjectService projectService;
+    private final TaskService taskService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectService projectService, TaskService taskService) {
         this.projectService = projectService;
+        this.taskService = taskService;
     }
     @PostMapping("/create")
     public ResponseEntity<ProjectResponseDTO> createProject(@RequestBody CreateProjectDTO createProjectDTO) {
@@ -66,5 +69,6 @@ public class ProjectController {
         ProjectMemberDTO projectMemberDTO = projectService.getProjectMember(projectId, projectMemberId);
         return new ResponseEntity<>(projectMemberDTO, HttpStatus.OK);
     }
+
 
 }
