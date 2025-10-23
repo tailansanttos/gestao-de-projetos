@@ -171,7 +171,7 @@ public class Project {
     public ProjectMember getMember(UUID memberId) {
         Optional<ProjectMember> optMember =
                 members.stream().filter(member ->
-                        member.getId().equals(memberId)).findFirst();
+                        member.getUser().getId().equals(memberId)).findFirst();
         if (optMember.isEmpty()){
             throw new IllegalArgumentException("Usuário não faz parte do projeto.");
         }
